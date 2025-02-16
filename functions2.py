@@ -89,7 +89,6 @@ def movies_by_category(movies, category):
     return [movie for movie in movies if movie['category'].lower() == category.lower()]
 
 def average_imdb_score(movies):
-   
     if not movies:
         return 0
     total_score = sum(movie['imdb'] for movie in movies)
