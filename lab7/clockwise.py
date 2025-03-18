@@ -1,17 +1,12 @@
 import pygame
 import datetime
-
-
-
 pygame.init()
 clock = pygame.time.Clock()
-
 screen = pygame.display.set_mode((736, 736))
-
-face = pygame.image.load('/Users/tevososepyan/Documents/PythonRep/lab7/clock.png.jpg')
-mi = pygame.image.load('/Users/tevososepyan/Documents/PythonRep/lab7/minute.png')
+face = pygame.image.load('/Users/tevososepyan/Documents/PythonRep/lab7/pictures/clock.png.jpg')
+mi = pygame.image.load('/Users/tevososepyan/Documents/PythonRep/lab7/pictures/minute.png').convert_alpha()
 min = pygame.transform.scale(mi, (72,356))
-se = pygame.image.load('/Users/tevososepyan/Documents/PythonRep/lab7/minarrow.png')
+se = pygame.image.load('/Users/tevososepyan/Documents/PythonRep/lab7/pictures/minarrow.png').convert_alpha()
 sec = pygame.transform.scale(se, (325, 960))
 
 while True:
