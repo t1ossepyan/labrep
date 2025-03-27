@@ -6,6 +6,7 @@ pygame.init()
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
+font = pygame.font.Font(None, 36)  
 
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)

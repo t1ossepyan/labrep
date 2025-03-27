@@ -17,14 +17,17 @@ score = 0
 
 font = pygame.font.Font(None, 36)  
 
+SPEED = 10
 
 snake = [(100, 100), (80, 100), (60, 100)] 
 direction = (CELL_SIZE, 0)
 apple = (random.randint(0, WIDTH // CELL_SIZE - 1) * CELL_SIZE, 
          random.randint(0, HEIGHT // CELL_SIZE - 1) * CELL_SIZE)
 
-
+texture = pygame.image.load("/Users/tevososepyan/Documents/PythonRep/lab8/sprites/edfwe.jpg")
+texture = pygame.transform.scale(texture, (CELL_SIZE, CELL_SIZE))
 running = True
+
 while running:
     screen.fill(WHITE)
 
@@ -32,6 +35,12 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    def retry():
+        text = font.render(f"ВЫ ПРОИГРАЛИ :(", True, (0, 0, 0))
+        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(text, text_rect)
+    
+        
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_UP] and direction != (0, CELL_SIZE):
@@ -49,10 +58,11 @@ while running:
     if (new_head[0] < 0 or new_head[0] >= WIDTH or
         new_head[1] < 0 or new_head[1] >= HEIGHT or
         new_head in snake[1:]):
-        running = False 
+        retry()
 
     if new_head == apple:
         score += 1
+        SPEED += 1
         apple = (random.randint(0, WIDTH // CELL_SIZE - 1) * CELL_SIZE, 
                  random.randint(0, HEIGHT // CELL_SIZE - 1) * CELL_SIZE)
     else:
@@ -63,12 +73,12 @@ while running:
 
     screen.blit(text, text_rect)
 
-    pygame.draw.rect(screen, RED, (apple[0], apple[1], CELL_SIZE, CELL_SIZE))
+    screen.blit(texture, (apple[0], apple[1]))
 
     for segment in snake:
         pygame.draw.rect(screen, GREEN, (segment[0], segment[1], CELL_SIZE, CELL_SIZE))
 
     pygame.display.flip()
-    clock.tick(10) 
+    clock.tick(SPEED) 
 
 pygame.quit()

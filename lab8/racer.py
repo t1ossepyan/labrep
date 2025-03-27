@@ -1,42 +1,62 @@
 import pygame
 import sys
 import random
+import time
 
-W = 800
-H = 500
+W = 300
+H = 800
 
 
 car = pygame.image.load("/Users/tevososepyan/Documents/PythonRep/lab8/sprites/unnamed.png")
-car_rect = car.get_rect(center=(W // 2, H // 2))
+car = pygame.transform.scale(car, (100, 100))
 
 enemy = pygame.image.load("/Users/tevososepyan/Documents/PythonRep/lab8/sprites/938z8l9w2ho51.png.webp")
-enemy_rect = enemy.get_rect().size
+sprite_img = pygame.transform.scale(enemy, (100, 100))
+sprite_size = sprite_img.get_rect().size
 
 screen = pygame.display.set_mode((W, H))
 
 
 sprites = []
 
-cordx = W // 2
-cordy = H // 2
+cordx = 0
+cordy = H - 100
 
 pygame.init()
 
-screen = pygame.display.set_mode((800, 500))
+font = pygame.font.Font(None, 36)  
 
-while True:
+running = True
+
+while running:
     for i in pygame.event.get():
         if i.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
     screen.fill((255, 255, 255))
 
-    if random.random() < 0.02:
-        x = random.randint(0, W - enemy_rect[0])  # Случайное место сверху
-        y = -enemy_rect[1]  # Старт выше экрана
-        speed = 5  # Случайная скорость падения
-        sprites.append([x, y, speed])
 
+
+    text = font.render(f"x {cordx}", True, (0, 0, 0))
+    text_rect = text.get_rect(topleft=(10, 10))
+
+    screen.blit(text, text_rect)
+
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_RIGHT] and cordx <= 200:
+        cordx += 1
+    if keys[pygame.K_LEFT] and cordx >= 0:
+        cordx -= 1
+
+
+    if random.random() < 0.001:
+        x = random.randint(0, 2)  # Случайное место сверху
+        y = -sprite_size[1]  # Старт выше экрана
+        speed = 1  # скорость падения
+        sprites.append([x*100, y, speed])
+
+    # Обновляем позиции спрайтов
     for sprite in sprites:
         sprite[1] += sprite[2]  # Двигаем вниз
 
@@ -45,26 +65,18 @@ while True:
 
     # Рисуем спрайты
     for sprite in sprites:
-        screen.blit(enemy, (sprite[0], sprite[1]))
+        screen.blit(sprite_img, (sprite[0], sprite[1]))
 
-    keys = pygame.key.get_pressed()
+    for sprite in sprites:
+        if sprite[0] <= cordx <= sprite[0]+100 and sprite[1] <= cordy <= sprite[1]+100 or sprite[0] <= cordx+100 <= sprite[0]+100 and sprite[1] <= cordy+100 <= sprite[1]+100:
+            print("Столкновение!")
+            running = False
+            sys.exit()
 
-    if keys[pygame.K_RIGHT]:
-        if cordx < W | cordx > 0:
-            cordx +=5
-        else:
-            cordx = W // 2
-    if keys[pygame.K_LEFT]:
-        if cordx <= W | cordx >= 0:
-            cordx -= 5
-        else:
-            cordx = W // 2
 
-    car_rect.clamp_ip(screen.get_rect())
-    
     screen.blit(car, (cordx, cordy))
 
-    
-    pygame.display.flip()
+
+    pygame.display.update()
 
 
