@@ -36,8 +36,6 @@ font = pygame.font.Font(None, 36)
 
 running = True
 
-
-
 while running:
     for i in pygame.event.get():
         if i.type == pygame.QUIT:
