@@ -33,7 +33,7 @@ cordy = H - 100
 pygame.init()
 
 font = pygame.font.Font(None, 36)  
-
+enemy_speed = 1
 running = True
 
 while running:
@@ -65,12 +65,13 @@ while running:
             cordx -= 0.5
         else:
             cordx -= 1
-
+    if score > 10:
+        enemy_speed = score // 10
 
     if random.random() < 0.001:
         x = random.randint(0, 2) 
         y = -sprite_size[1] 
-        speed = 1  
+        speed = enemy_speed  
         sprites.append([x*100, y, speed])
 
     for sprite in sprites:
@@ -88,8 +89,8 @@ while running:
 
     if random.random() < 0.0001:
         x = random.randint(0, 2) 
-        y = -coin_size[1] 
-        speed = 1 
+        y = -coin_size[1]
+        speed = 1
         coins.append([x*100, y, speed])
 
     for i in coins:
