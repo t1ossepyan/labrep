@@ -2,6 +2,29 @@ import pygame
 import random
 import time 
 import sys
+import psycopg2
+
+
+conn = psycopg2.connect(
+    dbname = "lab10",
+    user="tevos",
+    password="3489850",
+    host="localhost",
+    port="5432"
+)
+cur = conn.cursor()
+
+cur.execute("SELECT name FROM userscore")
+namelist = cur.fetchall()
+
+cur.execute("SELECT * FROM userscore")
+print(cur.fetchall())
+
+
+
+username = input("ВВЕДИТЕ ИМЯ ПОЛЬЗОВАТЕЛЯ:")
+
+
 
 pygame.init()
 
@@ -45,6 +68,22 @@ def retry():
     text1 = font.render("Game Over", True, (225,0,0))
     text2 = font.render(f"Ваш счет: {score}", True, (0,0,0))
     text3 = font.render(f"Нажмите ESC, чтобы выйти", True, (0,0,0))
+    ishere = False
+    for name in namelist:
+        if name[0] == username:
+            ishere = True
+        
+    if ishere:
+        cur.execute("""UPDATE userscore SET score = %s WHERE name = %s""", (score, username))
+        conn.commit()
+    else:
+        cur.execute("""INSERT INTO userscore (name, score)
+        VALUES (%s, %s);""", (username, score))
+        conn.commit()
+
+    cur.close()
+    conn.close()
+
 
     screen.blit(text1, (WIDTH // 2 - text1.get_width() // 2, HEIGHT // 3))
     screen.blit(text2, (WIDTH // 2 - text2.get_width() // 2, HEIGHT // 2))
