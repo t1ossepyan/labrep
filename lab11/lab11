@@ -1,0 +1,126 @@
+-- 1 find by pattern
+
+CREATE OR REPLACE FUNCTION find_by_pattern(pattern TEXT)
+RETURNS TEXT AS $$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM phonebook
+    WHERE name ILIKE '%' || pattern || '%'
+       OR phone ILIKE '%' || pattern || '%';
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- example
+
+SELECT * FROM find_by_pattern('8701');
+
+
+
+
+
+
+
+-- 2 insrt and update
+
+CREATE OR REPLACE PROCEDURE upsert_user(username TEXT, userphone TEXT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM phonebook WHERE name = username) THEN
+        UPDATE phonebook SET phone = userphone WHERE name = username;
+    ELSE
+        INSERT INTO phonebook(name, phone) VALUES (username, userphone);
+    END IF;
+END;
+$$;
+
+-- example 
+CALL upsert_user('David', '87019998877');
+CALL upsert_user('Alice Johnson', '87017775544');  -- Update phone
+
+
+
+
+
+
+
+
+
+-- 3 insert many users
+
+CREATE OR REPLACE PROCEDURE insert_many_users(
+    IN usernames VARCHAR(255)[], 
+    IN userphones VARCHAR(20)[]
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    i INT := 1;
+    invalid_list TEXT[] := '{}';
+BEGIN
+    WHILE i <= array_length(usernames, 1) LOOP
+
+        PERFORM upsert_user(usernames[i], userphones[i]);
+        i := i + 1;
+    END LOOP;
+END;
+$$;
+
+-- example
+CALL insert_many_users(
+    ARRAY['Benji', 'nika', 'Roma'], 
+    ARRAY['37474374799', '20102012891', '00000999011']
+);
+
+
+
+
+
+
+
+
+-- 4 pagination 
+
+CREATE OR REPLACE FUNCTION pagination(limit_value INTEGER, offset_value INTEGER)
+RETURNS TABLE (id INT, name VARCHAR, phone VARCHAR)
+LANGUAGE plpgsql AS
+$$
+BEGIN
+    RETURN QUERY
+    SELECT p.id, p.name, p.phone
+    FROM phonebook p
+    WHERE p.id IN (
+        SELECT generate_series(1, limit_value, offset_value)
+    )
+    ORDER BY p.id;
+END;
+$$;
+
+-- eample 
+
+SELECT * FROM pagination(5, 1);
+SELECT * FROM pagination(7, 2); -- ofset 2
+
+
+
+
+
+
+
+
+
+--5 delete
+
+CREATE OR REPLACE PROCEDURE delete_user(identifier TEXT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM phonebook
+    WHERE name = identifier OR phone = identifier;
+END;
+$$;
+
+--example 
+CALL delete_user('Grace');
+CALL delete_user('87012223344'); -- Delete by phone
